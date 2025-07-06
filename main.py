@@ -15,25 +15,24 @@ import os
 
 db = 'data.db'
 
-
-
 def clean():
     os.system("cls" if os.name == "nt" else "clear")
     
 def pause():
     input("Presiona Enter para continuar... \n")
+    
 
 
 # Funciones
 
-# Agregar Producto ----------------------------------------------------------------------------------------------
-def agregar_producto():
-    try: 
-        # Conexion
+# Verificar tabla creada
+
+def verificar_tabla():
+    # Conexion
         conexion = sqlite3.connect(db)
         cursor = conexion.cursor()
         
-        # Creacion de tabla por si no existe
+    # Creacion de tabla por si no existe
         cursor.execute('''
                     CREATE TABLE IF NOT EXISTS productos (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,14 +43,23 @@ def agregar_producto():
                         categoria TEXT NOT NULL
                         );
                     ''')
+
+def registrar_producto():
+    try: 
+        # Conexion
+        conexion = sqlite3.connect(db)
+        cursor = conexion.cursor()
+        
         # Datos Almacenados
         nombre = input(' Ingresa nombre del producto: ')
         descripcion = input(' Ingrese descripcion del producto (Opcional): ')
-        try:
+        
+        try: # Este try es por si ingresan un dato no entero
             cantidad = int(input( ' Ingresa la cantidad del producto: '))
             precio = int(input( ' Ingresa el precio del producto: '))
         except Exception as e:
             print ('Error en el ingreso de datos', e)
+            
         categoria = input( ' Ingresa la categoria del producto: ')
         
         # Ingreso de Datos
@@ -63,7 +71,7 @@ def agregar_producto():
         
         # Guardar y Cerrar
         conexion.commit()
-        print('\n Se ingresaro el producto correctamente \n')
+        print('Se ingresaro el producto correctamente \n')
            
     except Exception as e:
         print(' Error al agregar producto: ', e)
@@ -71,22 +79,48 @@ def agregar_producto():
         
     finally:
         conexion.close()
+        print('\n')
         pause()
         print( 'Volviendo al Menu... \n')
-        return  0
-# Agregar Producto ----------------------------------------------------------------------------------------------        
+        return  0    
         
+def mostrar_Producto():
+    try: 
+        # Conexion
+        conexion = sqlite3.connect(db)
+        cursor = conexion.cursor()
+        
+        # Mostrar producto
+        cursor.execute("SELECT * FROM productos")
+        productos = cursor.fetchall()
+        
+        print ( "id |    nombre      |  descripcion    |    precio    |     categoria      |")
+        print( '-' * 75)
+        for id, nombre, descripcion, cantidad, precio, categoria  in productos:
+            print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{precio:^14}|{categoria:^20}|") 
+            # el :>3 al lado de la variable determina la alineacion del texto y los espacios
+    except Exception as e:
+        print(' Hay un problema en la DB')
+        
+    finally:
+        conexion.close()
+        print('\n')
+        pause()
+        print( ' \n Volviendo al Menu... \n')
+        return  0   
+            
+
         
 # Visualizar Menu
 
 def menu():
     clean()
     print ('----------------------------------------------------------------------------------------------')
-    print ( '1) Agregar Registro' )
-    print ( '2) Actualizar Registros' )
-    print ( '3) Eliminar Registros' )
-    print ( '4) Busqueda de Productos' )
-    print ( '5) Busqueda de Productos' )
+    print ( '1) Registrar nuevo producto' )
+    print ( '2) Visualizar productos registrados')
+    print ( '3) Actualizar producto' )
+    print ( '4) Eliminar producto' )
+    print ( '5) Busqueda de Producto' )
     print ( '6) Reporte de productos con bajo stock' )
     print ( '0) Salir' )
     print ('----------------------------------------------------------------------------------------------')
@@ -95,18 +129,18 @@ def menu():
     
 # Programa
 opcion = ''
+verificar_tabla()
 
 while opcion != 10: 
 
     menu()
-   
     opcion = int(input(' Ingrese la opcion deseada luego presione la tecla Enter: '))
 
     match opcion:
         case 1:
-            opcion = agregar_producto()
-       # case 2:
-           # opcion = mostrar_Producto()
+            opcion = registrar_producto()
+        case 2:
+           opcion = mostrar_Producto()
        # case 3:
            # opcion = buscar_Producto()
        # case 4:
