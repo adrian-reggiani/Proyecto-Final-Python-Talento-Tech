@@ -200,8 +200,78 @@ def actualizar_producto() :
         print( 'Se ingreso un valor erroneo. Volviendo al menu... \n')
         pause()
         return 0
-                
+          
+def eliminar_producto():
+    # Conexion
+    conexion = sqlite3.connect(db)
+    cursor = conexion.cursor()
     
+    try:
+        id_producto = int(input(' Ingrese el ID del producto: \n')) 
+        cursor.execute('SELECT * FROM productos WHERE id = ?', (id_producto,))
+        producto = cursor.fetchone()
+        
+        if producto:
+           id, nombre, descripcion, cantidad, precio, categoria = producto
+           print('\n')
+           print("id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
+           print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|\n") 
+           
+        else:
+         print("Producto no encontrado.")
+         
+        opcion = input( f' Desea elimnar el producto? (S/N): ').strip().lower()
+        
+        if (opcion == 's'):
+            cursor.execute("DELETE FROM productos WHERE id = ?", (id_producto,))
+            conexion.commit()
+            print('\n Se elimino producto')
+        elif (opcion == 'n'):
+            print(' No se elimino producto')
+            
+        else:
+            print( 'Se ingreso un valor erroneo')
+        
+        
+    except Exception as e:
+        print(' Error con la consulta: ', e)
+    
+    finally:
+        conexion.close()
+        print('\n')
+        pause()
+        print( ' \n Volviendo al Menu... \n')
+        return  0 
+             
+def buscar_Producto():
+    # Conexion
+    conexion = sqlite3.connect(db)
+    cursor = conexion.cursor()
+    
+    try:
+        id_producto = int(input(' Ingrese el ID del producto: ')) 
+        cursor.execute('SELECT * FROM productos WHERE id = ?', (id_producto,))
+        producto = cursor.fetchone()
+        
+        if producto:
+           id, nombre, descripcion, cantidad, precio, categoria = producto
+           print('\n')
+           print("id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
+           print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|\n") 
+        else:
+         print("Producto no encontrado.")
+        
+    except Exception as e:
+        print(' Error con la consulta: ', e)
+        
+    finally:
+        conexion.close()
+        print('\n')
+        pause()
+        print( ' \n Volviendo al Menu... \n')
+        return  0 
+        
+        
 # Visualizar Menu
 
 def menu():
@@ -234,10 +304,10 @@ while opcion != 10:
             opcion = mostrar_producto()
         case 3:
             opcion = actualizar_producto()
-       # case 4:
-           # opcion = eliminar_Producto()
-       # case 5:
-           # opcion = buscar_Producto()
+        case 4:
+           opcion = eliminar_producto()
+        case 5:
+           opcion = buscar_Producto()
        # case 6:
            # opcion = eliminar_Producto()
         case 0:
