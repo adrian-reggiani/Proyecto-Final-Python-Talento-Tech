@@ -243,7 +243,7 @@ def eliminar_producto():
         print( ' \n Volviendo al Menu... \n')
         return  0 
              
-def buscar_Producto():
+def buscar_producto():
     # Conexion
     conexion = sqlite3.connect(db)
     cursor = conexion.cursor()
@@ -252,6 +252,8 @@ def buscar_Producto():
         id_producto = int(input(' Ingrese el ID del producto: ')) 
         cursor.execute('SELECT * FROM productos WHERE id = ?', (id_producto,))
         producto = cursor.fetchone()
+        
+        print(producto)
         
         if producto:
            id, nombre, descripcion, cantidad, precio, categoria = producto
@@ -263,6 +265,45 @@ def buscar_Producto():
         
     except Exception as e:
         print(' Error con la consulta: ', e)
+        
+    finally:
+        conexion.close()
+        print('\n')
+        pause()
+        print( ' \n Volviendo al Menu... \n')
+        return  0 
+ 
+def reporte_producto(): 
+    # Conexion
+    conexion = sqlite3.connect(db)
+    cursor = conexion.cursor()
+    
+    print(' Se realizara un reporte de producto con respecto a las cantidades de los items. El reporte sera de cantidades iguales o menores al numero ingresado \n')
+    cantidad = int(input('Ingresar el numero de la cantidades deseadas: \n'))
+    
+    try:
+        cursor.execute('SELECT * FROM productos WHERE cantidad <= ? ORDER BY  cantidad DESC', (cantidad,))
+        productos = cursor.fetchall()
+        
+        
+        if (len(productos) > 1):
+            print('\n')
+            print ( "id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
+            for id, nombre, descripcion, cantidad, precio, categoria  in productos:
+                print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|")
+                
+        elif (len(productos) == 1): 
+            producto = productos[0]
+            id, nombre, descripcion, cantidad, precio, categoria = producto
+            print('\n')
+            print("id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
+            print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|\n") 
+            
+        else:
+            print(' No hay producto con esa cantidad....')
+            
+    except Exception as e:
+        print('Hubo un error: ', e)
         
     finally:
         conexion.close()
@@ -307,9 +348,9 @@ while opcion != 10:
         case 4:
            opcion = eliminar_producto()
         case 5:
-           opcion = buscar_Producto()
-       # case 6:
-           # opcion = eliminar_Producto()
+           opcion = buscar_producto()
+        case 6:
+           opcion = reporte_producto()
         case 0:
             print ( 'Saliendo del programa...')
             break
