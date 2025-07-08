@@ -39,7 +39,7 @@ def registrar_producto(pause):
             cantidad = int(input( ' Ingresa la cantidad del producto: '))
             precio = int(input( ' Ingresa el precio del producto: '))
         except Exception as e:
-            print ('Error en el ingreso de datos', e)
+            print ('Error en el ingreso de datos, tiene que ser un numero entero... ', e)
             return 0
             
         categoria = input( ' Ingresa la categoria del producto: ')
@@ -105,13 +105,19 @@ def actualizar_producto(pause) :
     # Diccionario con los datos que se actualizaran
     datos_actualizados = {}
     
-    datos_actualizados['id'] = int(input( ' Ingrese el ID del producto: '))
-    
+    try:
+        datos_actualizados['id'] = int(input( ' Ingrese el ID del producto: '))
+    except Exception as e:
+        print('Se ingreso un dato que no es numerico. Se vuelve al menu....')
+        pause()
+        return 0       
+        
     # Opcion para que usuario vuelva al menu si desconoce la ID
     if (datos_actualizados['id'] == 0):
         print( '\n Volviendo al Menu... \n')
         pause()
         return  0 
+        
     
     # Funcion para validar la opcion del usuario
     def validar_opcion(campo):

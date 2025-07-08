@@ -15,12 +15,19 @@ def main():
     
     # Se inicia la variable opcion para el while
     opcion = ''
+    
+    # Verifica si la tabla productos existe sino la crea
     be.verificar_tabla()
     
     while opcion != 10: 
 
         fe.menu(clean)
-        opcion = int(input(' Ingrese la opcion deseada luego presione la tecla Enter: '))
+        try:
+            opcion = int(input(' Ingrese la opcion deseada luego presione la tecla Enter: '))
+        except ValueError:
+            print('Opcion invalida... Vuelva a ingresarlo')
+            pause()
+            continue
 
         match opcion:
             case 1:
@@ -38,6 +45,9 @@ def main():
             case 0:
                 print ( 'Saliendo del programa...')
                 break
+            case _:
+                print("Opcion invalida. Ingrese alguna de las opciones detalladas \n")
+                pause()
             
 if __name__ == "__main__":
     main()
