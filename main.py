@@ -1,15 +1,3 @@
-# Proyecto integrado
-
-# 2) Visualizar Registros
-
-# 3) Actualizar Registros (mediante su ID)
-# 4) Eliminar Registros (mediante su ID)
-# 5) Busqueda de Productos
-# 6) Reporte de productos con bajo stock
-# 0) Salir
-
-# Mover el create table al principio
-
 import sqlite3
 import os
 
@@ -24,8 +12,6 @@ def pause():
 
 
 # Funciones
-
-# Verificar tabla creada
 
 def verificar_tabla():
     # Conexion
@@ -45,6 +31,7 @@ def verificar_tabla():
                     ''')
 
 def registrar_producto():
+    print(' Acontinuacion se le solicitara datos del nuevo producto...')
     try: 
         # Conexion
         conexion = sqlite3.connect(db)
@@ -80,8 +67,8 @@ def registrar_producto():
     finally:
         conexion.close()
         print('\n')
-        pause()
         print( 'Volviendo al Menu... \n')
+        pause()
         return  0    
         
 def mostrar_producto():
@@ -94,25 +81,37 @@ def mostrar_producto():
         cursor.execute("SELECT * FROM productos")
         productos = cursor.fetchall()
         
-        print ( "id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
-        print( '-' * 75)
-        for id, nombre, descripcion, cantidad, precio, categoria  in productos:
-            print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|") 
+        if (productos):
+            print(' Se visualiza los siguientes productos: \n')
+            print ( "id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
+            print( '-' * 75)
+            for id, nombre, descripcion, cantidad, precio, categoria  in productos:
+                print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|") 
             # el :>3 al lado de la variable determina la alineacion del texto y los espacios
+        else: 
+            print(' No hay productos para visualizar....')
+        
     except Exception as e:
         print(' Hay un problema en la DB')
         
     finally:
         conexion.close()
         print('\n')
-        pause()
         print( ' \n Volviendo al Menu... \n')
+        pause()
         return  0   
     
 def actualizar_producto() :
+    print(' Es necesario conocer el ID del producto para actualizar. Puede obtenerlo a traves de la opcion 2) Visualizar productos registrados')
+    print(' Ingresando ID = 0, podra volver al menu \n')
+    datos_actualizados = {}
     
-    datos_actualizados = {} 
     datos_actualizados['id'] = int(input( ' Ingrese el ID del producto: '))
+    
+    if (datos_actualizados['id'] == 0):
+        print( '\n Volviendo al Menu... \n')
+        pause()
+        return  0 
     
     def validar_opcion(campo):
         
@@ -128,16 +127,19 @@ def actualizar_producto() :
     opcion = validar_opcion('nombre')
     if(opcion == 's'):
        datos_actualizados['nombre'] = input(' Ingrese nuevo nombre del producto: ')
+       print('\n')
         
     opcion = validar_opcion('descripcion')
     if(opcion == 's'):
         datos_actualizados['descripcion'] = input(' Ingrese nueva descripcion del producto: ')
+        print('\n')
         
     opcion = validar_opcion('cantidad')
     if(opcion == 's'):
         try: 
             cantidad = int(input(' Ingrese nueva cantidad del producto (Entero y positvo): '))
             datos_actualizados['cantidad'] = cantidad
+            print('\n')
         except Exception as e:
             print(f'No es un numero entero o no es positivo. {cantidad}')
         
@@ -146,14 +148,24 @@ def actualizar_producto() :
         try: 
             precio = int(input(' Ingrese nueva cantidad del producto (Entero y positvo): '))
             datos_actualizados['precio'] = precio
+            print('\n')
         except Exception as e:
             print(f'No es un numero entero o no es positivo. {precio}')
         
     opcion = validar_opcion('categoria')
     if(opcion == 's'):
         datos_actualizados['categoria'] = input(' Ingrese nueva categoria del producto: ')
+        print('\n')
     
-    print('Estos son los datos que se actualizaran: ', datos_actualizados, '\n')
+    print('\nEstos son los datos que se actualizarán:\n')
+    print("id |    nombre      |  descripcion    |  cantidad   |    precio    |     categoria      |")
+    print('-' * 75)
+    print(f"{datos_actualizados.get('id', ''):^3}|"
+            f"{datos_actualizados.get('nombre', ''):^16}|"
+            f"{datos_actualizados.get('descripcion', ''):^17}|"
+            f"{str(datos_actualizados.get('cantidad', '')):^13}|"
+            f"{str(datos_actualizados.get('precio', '')):^14}|"
+            f"{datos_actualizados.get('categoria', ''):^20}|")
     
     actualizar = input('Deseas actualizar los datos (S/N): ')
     if (actualizar == 's'):
@@ -186,8 +198,8 @@ def actualizar_producto() :
         finally:
             conexion.close()
             print('\n')
-            pause()
             print( ' \n Volviendo al Menu... \n')
+            pause()
             return  0   
             
         
@@ -202,12 +214,18 @@ def actualizar_producto() :
         return 0
           
 def eliminar_producto():
+    print(' Es necesario conocer el ID del producto para eliminarlo. Puede obtenerlo a traves de la opcion 2) Visualizar productos registrados')
+    print(' Ingresando ID = 0, podra volver al menu \n')
     # Conexion
     conexion = sqlite3.connect(db)
     cursor = conexion.cursor()
     
     try:
-        id_producto = int(input(' Ingrese el ID del producto: \n')) 
+        id_producto = int(input('Ingrese el ID del producto: \n')) 
+        
+        if (id_producto == 0):
+            return  0 
+    
         cursor.execute('SELECT * FROM productos WHERE id = ?', (id_producto,))
         producto = cursor.fetchone()
         
@@ -218,7 +236,8 @@ def eliminar_producto():
            print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|\n") 
            
         else:
-         print("Producto no encontrado.")
+         print("\n Producto no encontrado...")
+         return  0 
          
         opcion = input( f' Desea elimnar el producto? (S/N): ').strip().lower()
         
@@ -239,19 +258,27 @@ def eliminar_producto():
     finally:
         conexion.close()
         print('\n')
+        print( 'Volviendo al Menu... \n')
         pause()
-        print( ' \n Volviendo al Menu... \n')
         return  0 
              
 def buscar_producto():
+    print(' Es necesario conocer el ID del producto para visualizarlo. Puede obtenerlo a traves de la opcion 2) Visualizar productos registrados')
+    print(' Ingresando ID = 0, podra volver al menu \n')
+    
     # Conexion
     conexion = sqlite3.connect(db)
     cursor = conexion.cursor()
     
     try:
         id_producto = int(input(' Ingrese el ID del producto: ')) 
+        
+        if (id_producto == 0):
+            return  0 
+        
         cursor.execute('SELECT * FROM productos WHERE id = ?', (id_producto,))
         producto = cursor.fetchone()
+        
         
         print(producto)
         
@@ -269,8 +296,8 @@ def buscar_producto():
     finally:
         conexion.close()
         print('\n')
+        print( 'Volviendo al Menu... \n')
         pause()
-        print( ' \n Volviendo al Menu... \n')
         return  0 
  
 def reporte_producto(): 
@@ -300,7 +327,7 @@ def reporte_producto():
             print ( f"{id:^3}|{nombre:^16}|{descripcion:^17}|{cantidad:^13}|{precio:^14}|{categoria:^20}|\n") 
             
         else:
-            print(' No hay producto con esa cantidad....')
+            print(' Error numero ingresado...')
             
     except Exception as e:
         print('Hubo un error: ', e)
@@ -308,8 +335,8 @@ def reporte_producto():
     finally:
         conexion.close()
         print('\n')
-        pause()
         print( ' \n Volviendo al Menu... \n')
+        pause()
         return  0 
         
         
